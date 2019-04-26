@@ -1,0 +1,8 @@
+/.mypy_cache/*
+/build/*
+/utils/__pycache__/*
+.vscode/*
+__pycache__/*
+dist/*
+test/*.xlsx
+test/*.bat
