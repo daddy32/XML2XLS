@@ -4,5 +4,4 @@
 .vscode/*
 __pycache__/*
 dist/*
-test/*.xlsx
-test/*.bat
+test/*
