@@ -40,7 +40,7 @@ def xml_element_to_df(
 
     if xml_root is None:
         # TODO: Log
-        print('Received xml_root == None.')
+        print('ERROR: Received xml_root == None.')
         return
 
     if isinstance(columns, collections.Mapping):
@@ -82,7 +82,7 @@ def xml_element_to_df(
 
     if len(not_found) > 0:
         # TODO: log warning
-        print('Some columns could not be found (at least in some of the rows): {}'.format(not_found))
+        print('WARNING: Some columns could not be found (at least in some of the rows): {}'.format(not_found))
 
     # Try to convert columns to numeric type, if possible
     out_df = out_df.apply(pd.to_numeric, errors='ignore')
