@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import utils.xml as xml
 import utils.pandas as pd_util
