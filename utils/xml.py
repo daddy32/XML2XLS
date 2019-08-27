@@ -11,7 +11,7 @@ import collections
 
 def parse_element(recordList, indent = 0, max_level = 9999):
     '''
-        Helper function to parse an XML element and print all its childre, recursively.
+        Helper function to parse an XML element and print all its children, recursively.
     '''
 
     if max_level <= 0:

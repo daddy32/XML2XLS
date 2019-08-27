@@ -48,12 +48,14 @@ optional arguments:
 
 ### Compiling
 
-It is possible to build executable file for current platform, using pyinstaller (pyinstaller does not cross-compile):
+It is possible to build executable file for current platform, using pyinstaller (pyinstaller does not cross-compile). This makes it possible to run the program without dependencies (python runtime), but is not necessary if target computer has the runtime and dependencies installed.
+
+To create the executable, run the following command:
 `pyinstaller xml2xls.spec`
-Resulting executable is somewhat large (~100MB).
+Resulting file is somewhat large (~100MB).
 
 ## Roadmap
 
 - Examples along with imput data.
-- Pre-built executables.
+- Pre-built executables (on request).
 - Simple GUI (probably using Gooey).
