@@ -19,15 +19,16 @@ def parse_element(recordList, indent = 0, max_level = 9999):
 
     print(' '*indent + '{}'.format(recordList.tag))
     for child in recordList:
-        #print('    ' + child.tag)
+        # print('    ' + child.tag)
         parse_element(child, indent + 4, max_level-1)
 
 # XML to pandas inspired by:
 # https://robertopreste.com/blog/parse-xml-into-dataframe
 
+
 def xml_element_to_df(
         xml_root: et.Element,
-        columns, # list or dictionary
+        columns,  # list or dictionary
         namespace: str = ''
     ) -> pd.DataFrame:
     '''
@@ -65,7 +66,8 @@ def xml_element_to_df(
             else:
                 for cell in cells:
                     if isinstance(cell, et._Element):
-                        val += cell.text
+                        if cell.text is not None:
+                            val += cell.text
                     elif isinstance(cell, et._ElementUnicodeResult):
                         val += cell
                     else:

@@ -1,15 +1,12 @@
-import pandas as pd
 import utils.xml as xml
 import utils.pandas as pd_util
 import argparse
 import textwrap
 
-from datetime import datetime
-from pathlib import Path
 from os.path import splitext
 
 try:
-  from lxml import etree as et
+    from lxml import etree as et
 except ImportError:
     try:
         import xml.etree.ElementTree as et
@@ -40,6 +37,17 @@ def convert_and_save(
             print('  ERROR: Root not found. Query used: {}'.format(root_query))
             raise ValueError('Root not found.')
 
+    '''
+    print('Debug #1:')
+    xml.parse_element(data_root)
+    print('Debug #2:')
+    xml.parse_element(data_root[0])
+    print('Debug #3:')
+    print(columns)
+    '''
+    if columns is None or len(columns) == 0 or columns[0] == '[all]':
+        columns = [x.tag for x in data_root[1]]
+
     # Convert the file to Pandas dataFrame
     df = xml.xml_element_to_df(data_root, columns, namespace)
     if preview:
@@ -66,6 +74,7 @@ def convert_and_save(
     # Save the file
     pd_util.save_df_to_file(df, output_file_name)
     #df.to_excel(output_file_name)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -98,17 +107,27 @@ def parse_args():
         IE all parent\'s children with satisfying this selection will be transformed to rows in resulting table.',
         default='')
     '''
-    parser.add_argument('column', nargs='+', action='append',
-        help='Repeatable. Name or XPath of a child element to be used as an column.')
-    parser.add_argument('-l', '--labels', nargs='+', action='append',
+    parser.add_argument(
+        'column',
+        nargs='+',
+        action='append',
+        help='Repeatable. Name or XPath of a child element to be used as an column. Special value "[all]" indicates that all the child element should be extracted.'
+    )
+    parser.add_argument(
+        '-l', '--labels',
+        nargs='+',
+        action='append',
         help='Optional list of column labels. \
-        If not given, their XML names (or XPaths) given in "column" argument are used.')
+        If not given, their XML names (or XPaths) given in "column" argument are used.'
+    )
     parser.add_argument('-v', '--preview', action='store_true',
         help='Display the preview of the output file in the console.')
 
     # TODO: null value, explicit file_format
+    # TODO: head(n) support
 
     return parser.parse_args()
+
 
 def main(args):
     # Prepare the parameters
@@ -120,13 +139,13 @@ def main(args):
 
     # Do the action
     convert_and_save(
-        input_file_name = args.input_file,
-        columns = columns,
-        output_file_name = args.output_file,
-        namespace = args.namespace,
-        root_element_name = args.parent_element,
+        input_file_name=args.input_file,
+        columns=columns,
+        output_file_name=args.output_file,
+        namespace=args.namespace,
+        root_element_name=args.parent_element,
         # file_format = file_format,
-        preview = args.preview
+        preview=args.preview
     )
 
 
