@@ -23,9 +23,11 @@ def convert_and_save(
         file_format: str='',
         preview: bool=False
     ):
+    print('  Loading the XML...');
     # Load the XML file and parse it
     xtree = et.parse(input_file_name)
     xroot = xtree.getroot()
+    print('  ...done.');
 
     if root_element_name is None or root_element_name == '':
         data_root = xroot
@@ -45,11 +47,17 @@ def convert_and_save(
     print('Debug #3:')
     print(columns)
     '''
-    if columns is None or len(columns) == 0 or columns[0] == '[all]':
+
+    print('  ');
+
+    if columns is None or len(columns) == 0 or (isinstance(columns, list) and columns[0] == '[all]'):
         columns = [x.tag for x in data_root[1]]
+        # TODO: include also attributes
 
     # Convert the file to Pandas dataFrame
+    print('  Converting to dataframe...')
     df = xml.xml_element_to_df(data_root, columns, namespace)
+    print('  ...done')
     if preview:
         print('  Output preview:')
         print(df.head(10))
@@ -74,6 +82,7 @@ def convert_and_save(
     # Save the file
     pd_util.save_df_to_file(df, output_file_name)
     #df.to_excel(output_file_name)
+    print('  ...done')
 
 
 def parse_args():

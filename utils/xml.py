@@ -8,6 +8,7 @@ except ImportError:
 
 import pandas as pd
 import collections
+import time
 
 def parse_element(recordList, indent = 0, max_level = 9999):
     '''
@@ -36,7 +37,7 @@ def xml_element_to_df(
         from their first-level childred given by names and transforms them
         into rows and columns of a Pandas DataFrame
     '''
-
+    start_time = time.time()
     column_names = []
 
     if xml_root is None:
@@ -53,16 +54,28 @@ def xml_element_to_df(
     not_found = set()
 
     # TODO: Option to detect column names automatically, remove namespace from them for df.
-    out_df = pd.DataFrame(columns=column_names)
+    # TODO: Consider: Can't we run xpath in bulk, instead of separately for every row?
+    node_count = len(xml_root)
+    print('     total nodes: {}'.format(node_count))
+    i = 0
+
+    dictionary_list = []
     for node in xml_root:
-        values = []
+        i += 1
+
+        if i % 1000 == 0:
+            curr_time = time.time()
+            print('     Done: {}% ({})'.format(round(1000*i/node_count)/10, i))
+            print('         time = %.6f seconds' % (curr_time-start_time))
+
+        values = {}
+        k = 0
         for column in columns:
             cells = node.xpath(namespace + column)
             val: str = ''
             if cells is None or len(cells) == 0:
                 val = None
                 not_found.add(column)
-                #!print("     Not found.")
             else:
                 for cell in cells:
                     if isinstance(cell, et._Element):
@@ -75,12 +88,13 @@ def xml_element_to_df(
                     val += ' '
                 val = val.strip()
 
-            values.append(val)
+            values[column_names[k]] = val
+            k += 1
 
-        out_df = out_df.append(
-            pd.Series(values, index=column_names),
-            ignore_index = True
-        )
+        dictionary_list.append(values)
+
+    print(' output size: {}'.format(len(dictionary_list)))
+    out_df = pd.DataFrame.from_dict(dictionary_list)
 
     if len(not_found) > 0:
         # TODO: log warning
@@ -88,5 +102,8 @@ def xml_element_to_df(
 
     # Try to convert columns to numeric type, if possible
     out_df = out_df.apply(pd.to_numeric, errors='ignore')
+
+    end_time = time.time()
+    print('     Execution time = %.6f seconds' % (end_time-start_time))
 
     return out_df
